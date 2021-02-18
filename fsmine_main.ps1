@@ -1,7 +1,7 @@
 
 while ($true) {
 
- Clear-Variable -Name ("flightsim", "var2")
+ Clear-Variable -Name ("flightsim", "nsfm", "sleeptime")
  
  $sleeptime = 120
  $flightsim = Get-Process FlightSimulator -ErrorAction SilentlyContinue
