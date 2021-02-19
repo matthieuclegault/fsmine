@@ -1,0 +1,14 @@
+
+
+## --upcoming---
+ . differentiate logs and tasks in diagnostic
+ . option to create a log file
+ . verify and install scheduled task at startup
+ . verify and install mining soft
+
+## --v0.2---
+ . code is now seperated in functions
+ . added echos for diagsnotic
+
+## --v0.1---
+ . initial version of the script
