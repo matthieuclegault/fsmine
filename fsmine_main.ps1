@@ -1,57 +1,62 @@
 
 ## --Parameters-and-Variables---
-param ([switch] $cool=$true, $fs=$false)
+param ([switch] $cool, $fs)
+$sleeptime = 120
 
 
 
 ## --Functions---
 
-function GetTimeStamp {
+function fGetTimeStamp {
     return "[{0:MM/dd/yy} {0:HH:mm:ss}]" -f (Get-Date)
 }
 
-function fCooling {
-    #bkebke
+function fExitNsfm {
+    Get-Process nsfminer | Stop-Process
+    Sleep 5
+    Get-Process nsfminer -ErrorAction SilentlyContinue | Stop-Process -Force
 }
 
-function Looping {
- Write-Output `n
- Write-Output " LOG:  started looping at $(GetTimeStamp)."
- Clear-Variable -Name ("flightsim", "nsfm", "sleeptime") -ErrorAction SilentlyContinue
- 
- $sleeptime = 120
- $flightsim = Get-Process FlightSimulator -ErrorAction SilentlyContinue
- $nsfm = Get-Process nsfminer -ErrorAction SilentlyContinue
- 
- if ($flightsim) {
+function fFS { 
+ if ($(Get-Process FlightSimulator -ErrorAction SilentlyContinue)) {
   Write-Output " LOG:  FlightSimulator is opened, do not start."
-  if ($nsfm) {
+  if ($(Get-Process nsfminer -ErrorAction SilentlyContinue)) {
       Write-Output " LOG:   Mining soft is opened, exiting..."
-       # try gracefully first
-      $nsfm | Stop-Process
-       # kill after five seconds
-      Sleep 5
-      if (!$nsfm.HasExited) {
-        $nsfm | Stop-Process -Force
-       }
+      fExitNsfm
    }
-  Start-Sleep -Seconds $sleeptime
- } elseif ($nsfm) {
+ } elseif ($(Get-Process nsfminer -ErrorAction SilentlyContinue)) {
   Write-Output " LOG:  Mining soft is opened, sleeping."
-  Start-Sleep -Seconds $sleeptime
  } else {
-  Write-Output " `n starting the mining at $(GetTimeStamp). `n "
+  Write-Output " Starting the mining at $(fGetTimeStamp). "
   cmd /c 'start C:\install\nsfminer.exe -P stratum1+ssl://0x5d6122C69F627f3a6eF4C9C697bE538A065987f4.Slsh@us1.ethermine.org:5555 -U'
-  Start-Sleep -Seconds $sleeptime
+  if (!$(Test-Path C:\install\nsfm.lock)) { echo $null >> C:\install\nsfm.lock }
  }
+}
+
+function fCooling {
+    if (($(fGetTimeStamp) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -gt 6) { 
+        if (($(fGetTimeStamp) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -lt 12) {
+           Write-Output " Mining has been running for 6+ hours. Cooling off now. "
+           fExitNsfm
+           rm C:\install\nsfm.lock
+        }
+    }
 }
 
 
 
 ## --Main-program---
 
-while ($true) {
- Looping
+Write-Output `n
+Write-Output " Script started at $(fGetTimeStamp)."
+
+while ($cool -or $fs) {
+ 
+ if ($fs) { fFS }
+ if ($cool) { fCooling }
+  
+ Start-Sleep -Seconds $sleeptime
+ 
 }
 
 
@@ -66,4 +71,6 @@ while ($true) {
  #  https://www.red-gate.com/simple-talk/sysadmin/powershell/how-to-use-parameters-in-powershell/
  #  https://stackoverflow.com/questions/14405587/powershell-mandatory-bool-always-true
  #  https://social.technet.microsoft.com/wiki/contents/articles/23826.powershell-how-to-use-switch-parameter.aspx
+ #  https://superuser.com/questions/502374/equivalent-of-linux-touch-to-create-an-empty-file-with-powershell
+ #  https://www.shellhacks.com/windows-touch-command-equivalent/
  
