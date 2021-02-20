@@ -12,9 +12,9 @@ function fGetTimeStamp {
 }
 
 function fExitNsfm {
-    Get-Process nsfminer | Stop-Process
+    Get-Process nsfminer -ErrorAction SilentlyContinue | Stop-Process
     Sleep 5
-    Get-Process nsfminer -ErrorAction SilentlyContinue | Stop-Process -Force
+    if(!$(Get-Process nsfminer -ErrorAction SilentlyContinue)) { Stop-Process nsfminer -Force }
 }
 
 function fFS { 
@@ -34,11 +34,15 @@ function fFS {
 }
 
 function fCooling {
-    if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -gt 6) { 
-        if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -lt 12) {
-           Write-Output " Mining has been running for 6+ hours. Cooling off now. "
-           fExitNsfm
-           rm C:\install\nsfm.lock
+    if ($(Test-Path C:\install\nsfm.lock)) {
+        if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock).LastWriteTime)).totalhours -gt 6) { 
+            #if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock).LastWriteTime)).totalhours -lt 12) {
+               Write-Output " Mining has been running for 6+ hours. "
+               fExitNsfm
+               rm C:\install\nsfm.lock
+               Write-Output " Cooling off now, for 30min or so. "
+               Start-Sleep -Seconds 1680
+            #}
         }
     }
 }
@@ -52,8 +56,8 @@ Write-Output " Script started at $(fGetTimeStamp)."
 
 while ($cool -or $fs) {
  
- if ($fs) { fFS }
  if ($cool) { fCooling }
+ if ($fs) { fFS }
   
  Start-Sleep -Seconds $sleeptime
  
