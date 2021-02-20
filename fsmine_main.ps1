@@ -34,8 +34,8 @@ function fFS {
 }
 
 function fCooling {
-    if (($(fGetTimeStamp) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -gt 6) { 
-        if (($(fGetTimeStamp) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -lt 12) {
+    if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -gt 6) { 
+        if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock -ErrorAction SilentlyContinue).LastWriteTime)).totalhours -lt 12) {
            Write-Output " Mining has been running for 6+ hours. Cooling off now. "
            fExitNsfm
            rm C:\install\nsfm.lock
@@ -73,4 +73,6 @@ while ($cool -or $fs) {
  #  https://social.technet.microsoft.com/wiki/contents/articles/23826.powershell-how-to-use-switch-parameter.aspx
  #  https://superuser.com/questions/502374/equivalent-of-linux-touch-to-create-an-empty-file-with-powershell
  #  https://www.shellhacks.com/windows-touch-command-equivalent/
+ #  https://www.spguides.com/powershell-find-files-modified-in-last-24-hours-and-powershell-get-last-modified-time-of-files-in-folder/
+ #  https://www.powershelladmin.com/wiki/Use_test-path_with_powershell_to_check_if_a_file_exists
  
