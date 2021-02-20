@@ -1,6 +1,6 @@
 
 ## --Parameters-and-Variables---
-param ([switch] $cool, $fs)
+param ([switch] $cool=$true, $fs=$true)
 $sleeptime = 120
 
 
