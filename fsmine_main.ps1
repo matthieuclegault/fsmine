@@ -26,9 +26,10 @@ function Looping {
  if ($flightsim) {
   Write-Output " LOG:  FlightSimulator is opened, do not start."
   if ($nsfm) {
-      # try gracefully first
+      Write-Output " LOG:   Mining soft is opened, exiting..."
+       # try gracefully first
       $nsfm | Stop-Process
-      # kill after five seconds
+       # kill after five seconds
       Sleep 5
       if (!$nsfm.HasExited) {
         $nsfm | Stop-Process -Force
