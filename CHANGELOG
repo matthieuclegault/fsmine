@@ -1,8 +1,10 @@
 
 
 ## --upcoming---
+ . close/kill the mining soft when FS is running
  . differentiate logs and tasks in diagnostic
  . option to create a log file
+ . option to cycle through a 'cooling phase'
  . verify and install scheduled task at startup
  . verify and install mining soft
 
