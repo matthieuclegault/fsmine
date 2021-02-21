@@ -47,6 +47,16 @@ function fCooling {
     }
 }
 
+function fscktask {
+    if (!$(Get-ScheduledTask fsmine -ErrorAction SilentlyContinue)) {
+        $taskAction = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-ExecutionPolicy Bypass -File C:\install\fsmine_main.ps1'
+        $taskTrigger = New-ScheduledTaskTrigger -AtStartup -RandomDelay (New-TimeSpan -minutes 1)
+        $taskSettings = New-ScheduledTaskSettingsSet -DisallowHardTerminate -DontStopOnIdleEnd
+            $taskSettings.ExecutionTimeLimit = 'PT0S'
+        Register-ScheduledTask -Action $taskAction -Trigger $taskTrigger -TaskName "fsmine" -Settings $taskSettings -User "System"
+    }
+}
+
 
 
 ## --Main-program---
@@ -54,6 +64,7 @@ function fCooling {
 Write-Output `n
 Write-Output " Script started at $(fGetTimeStamp)."
 
+fscktask
 rm C:\install\nsfm.lock -ErrorAction SilentlyContinue
 
 while ($cool -or $fs) {
@@ -82,4 +93,7 @@ while ($cool -or $fs) {
  #  https://www.spguides.com/powershell-find-files-modified-in-last-24-hours-and-powershell-get-last-modified-time-of-files-in-folder/
  #  https://www.powershelladmin.com/wiki/Use_test-path_with_powershell_to_check_if_a_file_exists
  #  https://adamtheautomator.com/how-to-get-a-computer-name-with-powershell/
+ #  https://adamtheautomator.com/powershell-scheduled-task/
+ #  https://stackoverflow.com/questions/2000674/powershell-create-scheduled-task-to-run-as-local-system-service
+ #  https://dscottraynsford.wordpress.com/2017/12/17/create-a-scheduled-task-with-unlimited-execution-time-limit-in-powershell/
  
