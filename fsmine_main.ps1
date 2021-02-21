@@ -28,20 +28,20 @@ function fFS {
   Write-Output " LOG:  Mining soft is opened, sleeping."
  } else {
   Write-Output " Starting the mining at $(fGetTimeStamp). "
-  cmd /c 'start C:\install\nsfminer.exe -P stratum1+ssl://0x5d6122C69F627f3a6eF4C9C697bE538A065987f4.Slsh@us1.ethermine.org:5555 -U'
+  cmd /c "start C:\install\nsfminer.exe -P stratum1+ssl://0x5d6122C69F627f3a6eF4C9C697bE538A065987f4.$(hostname)@us1.ethermine.org:5555 -U"
   if (!$(Test-Path C:\install\nsfm.lock)) { echo $null >> C:\install\nsfm.lock }
  }
 }
 
 function fCooling {
     if ($(Test-Path C:\install\nsfm.lock)) {
-        if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock).LastWriteTime)).totalhours -gt 6) { 
+        if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock).LastWriteTime)).totalhours -gt 4) { 
             #if (($(Get-Date) - $((Get-Item C:\install\nsfm.lock).LastWriteTime)).totalhours -lt 12) {
-               Write-Output " Mining has been running for 6+ hours. "
+               Write-Output " Mining has been running for 4+ hours. "
                fExitNsfm
                rm C:\install\nsfm.lock
-               Write-Output " Cooling off now, for 30min or so. "
-               Start-Sleep -Seconds 1680
+               Write-Output " Cooling off for 20min now. "
+               Start-Sleep -Seconds 1200
             #}
         }
     }
@@ -53,6 +53,8 @@ function fCooling {
 
 Write-Output `n
 Write-Output " Script started at $(fGetTimeStamp)."
+
+rm C:\install\nsfm.lock -ErrorAction SilentlyContinue
 
 while ($cool -or $fs) {
  
@@ -79,4 +81,5 @@ while ($cool -or $fs) {
  #  https://www.shellhacks.com/windows-touch-command-equivalent/
  #  https://www.spguides.com/powershell-find-files-modified-in-last-24-hours-and-powershell-get-last-modified-time-of-files-in-folder/
  #  https://www.powershelladmin.com/wiki/Use_test-path_with_powershell_to_check_if_a_file_exists
+ #  https://adamtheautomator.com/how-to-get-a-computer-name-with-powershell/
  
