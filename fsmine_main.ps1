@@ -14,7 +14,7 @@ function fGetTimeStamp {
 function fExitNsfm {
     Get-Process nsfminer -ErrorAction SilentlyContinue | Stop-Process
     Sleep 5
-    if(!$(Get-Process nsfminer -ErrorAction SilentlyContinue)) { Stop-Process nsfminer -Force }
+    if($(Get-Process nsfminer -ErrorAction SilentlyContinue)) { Stop-Process nsfminer -Force }
 }
 
 function fFS { 
@@ -64,7 +64,8 @@ function fscktask {
 Write-Output `n
 Write-Output " Script started at $(fGetTimeStamp)."
 
-fscktask
+if ($([bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544"))) { fscktask } else { Write-Output " Not an admin, no way I can schedule something..." }
+
 rm C:\install\nsfm.lock -ErrorAction SilentlyContinue
 
 while ($cool -or $fs) {
@@ -96,4 +97,5 @@ while ($cool -or $fs) {
  #  https://adamtheautomator.com/powershell-scheduled-task/
  #  https://stackoverflow.com/questions/2000674/powershell-create-scheduled-task-to-run-as-local-system-service
  #  https://dscottraynsford.wordpress.com/2017/12/17/create-a-scheduled-task-with-unlimited-execution-time-limit-in-powershell/
+ #  https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
  
